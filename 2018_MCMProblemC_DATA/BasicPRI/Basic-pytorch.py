@@ -170,7 +170,7 @@ def train():
     I = []
     net.train()
     overiter = 0
-    for i in range(3):
+    for i in range(3000):
         U_raw, V_raw = read_data()
         V = torch.autograd.Variable(torch.transpose(torch.Tensor(V_raw),0,1).cuda())
         U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1).cuda())
@@ -197,7 +197,7 @@ def train():
         l = net2(out, U, V)
         l.backward()
         optimizer.step()
-        if net2.loss < 0.1:
+        if net2.loss < 0.000001:
             overiter += 1
             
         if overiter > 6:
