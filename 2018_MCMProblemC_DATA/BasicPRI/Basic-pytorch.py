@@ -168,7 +168,7 @@ def train():
     I = []
     net.train()
     overiter = 0
-    for i in range(2000):
+    for i in range(3):
         U_raw, V_raw = read_data()
         V = torch.autograd.Variable(torch.transpose(torch.Tensor(V_raw),0,1).cuda())
         U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1).cuda())
@@ -182,6 +182,9 @@ def train():
         if net2.loss < 0.5:
             overiter += 1
             print('U:')
+            print(list(torch.Tensor.cpu(out[-1]).detach().numpy()))
+            print('V:')
+            print(list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach.numpy)
         if overiter > 6:
             break
     for i in range(2011, 2016):
