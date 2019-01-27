@@ -181,8 +181,12 @@ def train():
         print(list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy()))
         print(list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -4])).detach().numpy()))
         print('loss2:')
-        print(torch.norm((U[:, -1]-torch.mv(net.weight, V[:, -1])),p=2))
-        print(torch.norm((U[:, -4]-torch.mv(net.weight, V[:, -4])),p=2))
+        bufff = 0
+        for i in range(num_years-1):
+            buffff = torch.norm((U[:, i]-torch.mv(net.weight, V[:, i])),p=2)**2, end=','
+            buff += buffff
+            print(buffff)
+        print(buff)
         optimizer.zero_grad()
         out = net.forward(V)
         net2 = loss().cuda()
