@@ -71,6 +71,7 @@ class loss(torch.nn.Module):
         for i in range(num_years-1):
             loss += torch.norm((U[:, i]-torch.mv(net.weight, V[:, i])),p=2)**2
         loss = loss/(stddev**2)
+        print(loss)
         return loss
 
 net = BasicModule()
@@ -78,7 +79,7 @@ net = BasicModule()
 net = net.cuda()
 cudnn.benchmark = True
 
-optimizer = torch.optim.SGD(net.parameters(),lr=0.001)
+optimizer = torch.optim.Adam(net.parameters(),lr=0.1)
 
 def read_data():
     fileloaded = xlrd.open_workbook('../MCM_NFLIS_Data.xlsx')
@@ -158,7 +159,7 @@ def read_data():
 
 def train():
     net.train()
-    for i in range(100):
+    for i in range(1000):
         U_raw, V_raw = read_data()
         V = torch.autograd.Variable(torch.transpose(torch.Tensor(V_raw),0,1).cuda())
         U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1).cuda())
