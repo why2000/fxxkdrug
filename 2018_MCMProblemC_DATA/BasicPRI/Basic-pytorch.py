@@ -57,11 +57,11 @@ class BasicModule(torch.nn.Module):
     def __init__(self):
         super(BasicModule, self).__init__()
         weight = torch.nn.Parameter(torch.randn(num_cities, num_cities))
-        self.weight = torch.nn.init.normal_(weight, mean=0.0) 
-        
-    def forward(self,x):
         m = torch.nn.ReLU()
-        out = m(torch.mm(self.weight, x) + bias)
+        self.weight = m(torch.nn.init.normal_(weight, mean=0.0))
+        
+    def forward(self,x): 
+        out = torch.mm(self.weight, x) + bias
         return out
 
 class loss(torch.nn.Module):
@@ -71,9 +71,6 @@ class loss(torch.nn.Module):
     def forward(self,out, U, V):
         loss = 0
         for i in range(num_years-1):
-            print(out.shape)
-            print(U[:,i].shape)
-            print(U[:,i])
             loss += torch.norm((U[:, i]-out[:,i]),p=2)**2
         loss = loss/(stddev**2)
         print(loss)
