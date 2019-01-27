@@ -169,7 +169,7 @@ def train():
         l.backward()
         optimizer.step()
         
-    prid = list(torch.mv(net.weight, V[:, -1]).detach().numpy())
+    prid = list(Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy())
     print(prid)
     to_csv(prid, './prid.csv')
 
