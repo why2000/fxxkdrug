@@ -72,8 +72,8 @@ class loss(torch.nn.Module):
         loss = 0
         for i in range(num_years-1):
             print(out.shape)
-            print(U[:i].shape)
-            print(U[:i])
+            print(U[:,i].shape)
+            print(U[:,i])
             loss += torch.norm((U[:, i]-out[:,i]),p=2)**2
         loss = loss/(stddev**2)
         print(loss)
