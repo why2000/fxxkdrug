@@ -6,7 +6,7 @@ import os
 import torch.backends.cudnn as cudnn
 
 stddev = 1.0
-num_years = 5
+num_years = 6
 num_cities = 88
 learning_rate = 1e-3
 num_step = 3
@@ -143,23 +143,26 @@ def read_data():
     gids = list(namedict['OH'].values())
     infected = []
     inf_rate = []
-    to_csv(gids, '../gid_order')
+    with open('../gid_order', 'w') as order_table:
+        for gid in gids:
+            order_table.write(str(gid)+'\n')
     for year in yeardict.keys():
         # print(year)
-        if year == 2010 or year == 2017 or year == 2016:
+        if year == 2010 or year == 2017:
             continue
         buf_inf_rate = []
         buf_infected = []
         for gid in gids:
-            buf_infected.append(yeardict[year][gid])
+            buf_infected.append(yeardict[year-1][gid])
             buf_inf_rate.append((yeardict[year][gid]-yeardict[year-1][gid])/(poldict[gid]-yeardict[year-1][gid]))
         inf_rate.append(buf_inf_rate)
         infected.append(buf_infected)
     return inf_rate, infected
 
 def train():
+    I = []
     net.train()
-    for i in range(1000):
+    for i in range(2):
         U_raw, V_raw = read_data()
         V = torch.autograd.Variable(torch.transpose(torch.Tensor(V_raw),0,1).cuda())
         U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1).cuda())
@@ -170,6 +173,13 @@ def train():
         l = net2(out, U, V)
         l.backward()
         optimizer.step()
+    for i in range(2011, 2016):
+        It = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, i-2011]) + V[:, i-2011]).detach().numpy())
+        I.append(It)
+        with open('./result', 'w') as resfile:
+            with open('../gid_order') as ordfile:
+                for gid, res in zip(It, list(ordfile.readlines())):
+                    resfile.write(gid+','res+'\n')
     prid = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy())
     print(prid)
     # to_csv(prid, './prid.csv')
