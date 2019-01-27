@@ -65,6 +65,7 @@ class BasicModule(torch.nn.Module):
 
 class loss(torch.nn.Module):
     def __init__(self):
+        self.loss = 0
         super(loss, self).__init__()
     def forward(self,out, U, V):
         loss = 0
@@ -72,6 +73,7 @@ class loss(torch.nn.Module):
             loss += torch.norm((U[:, i]-torch.mv(net.weight, V[:, i])),p=2)**2
         loss = loss/(stddev**2)
         print(loss)
+        self.loss = loss
         return loss
 
 net = BasicModule()
@@ -173,13 +175,15 @@ def train():
         l = net2(out, U, V)
         l.backward()
         optimizer.step()
+        if l.loss < 3:
+            break
     for i in range(2011, 2016):
         It = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, i-2011]) + V[:, i-2011]).detach().numpy())
         I.append(It)
         with open('./result', 'w') as resfile:
             with open('../gid_order') as ordfile:
                 for res, gid in zip(It, list(ordfile.readlines())):
-                    resfile.write(gid.strip('\n'+','+str(res)+'\n')
+                    resfile.write(gid.strip('\n')+','+str(res)+'\n')
     prid = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy())
     print(prid)
     # to_csv(prid, './prid.csv')
