@@ -60,8 +60,7 @@ class BasicModule(torch.nn.Module):
         self.weight = torch.nn.init.normal_(weight, mean=0.0) 
         
     def forward(self,x):
-        m = torch.nn.ReLU()
-        out = torch.mm(m(self.weight), x) + bias
+        out = torch.mm(self.weight, x) + bias
         return out
 
 class loss(torch.nn.Module):
