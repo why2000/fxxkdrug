@@ -19,7 +19,7 @@ bias = torch.transpose(torch.Tensor(bias),0,1)
 
 def loadpol(filename, namedict):
     fileinfo = {}
-    path = os.path.join('./人口/',filename)
+    path = os.path.join('../人口/',filename)
     with open(path, 'r', encoding='utf-8') as onefile:
         for i, row in enumerate(onefile.readlines()):
             rowsplit = row.split(',')
@@ -82,7 +82,7 @@ cudnn.benchmark = True
 optimizer = torch.optim.SGD(net.parameters(),lr=0.001)
 
 def read_data():
-    fileloaded = xlrd.open_workbook('./2018_MCMProblemC_DATA/MCM_NFLIS_Data.xlsx')
+    fileloaded = xlrd.open_workbook('../MCM_NFLIS_Data.xlsx')
     table = fileloaded.sheets()[1]
     placelist = []
     placedict = {}
@@ -134,7 +134,7 @@ def read_data():
         else:
             namedict[statename][countyname] = sgid
 
-    polfile = os.listdir('./2018_MCMProblemC_DATA/人口/')
+    polfile = os.listdir('../人口/')
     poldict = {}
     for onefile in polfile:
         if onefile.startswith('.'):
@@ -143,7 +143,7 @@ def read_data():
     gids = list(namedict['OH'].values())
     infected = []
     inf_rate = []
-    to_csv(gids, './gid_order')
+    to_csv(gids, '../gid_order')
     for year in yeardict.keys():
         # print(year)
         if year == 2010 or year == 2017 or year == 2016:
