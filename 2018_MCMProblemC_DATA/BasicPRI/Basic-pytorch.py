@@ -171,7 +171,7 @@ def train():
         
     prid = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy())
     print(prid)
-    to_csv(prid, './prid.csv')
+    # to_csv(prid, './prid.csv')
 
 
 train()
