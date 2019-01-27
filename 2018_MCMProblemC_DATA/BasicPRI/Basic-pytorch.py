@@ -73,7 +73,8 @@ class loss(torch.nn.Module):
         for i in range(num_years-1):
             print(out.shape)
             print(U[:i].shape)
-            loss += torch.norm((U[:, i]-out),p=2)**2
+            print(U)
+            loss += torch.norm((U[:, i]-out[:,i]),p=2)**2
         loss = loss/(stddev**2)
         print(loss)
         self.loss = loss
@@ -192,6 +193,8 @@ def train():
         print(buff)
         optimizer.zero_grad()
         out = net.forward(V)
+        print('out:')
+        print(out.shape)
         net2 = loss().cuda()
         l = net2(out, U, V)
         l.backward()
