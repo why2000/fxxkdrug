@@ -178,8 +178,8 @@ def train():
         I.append(It)
         with open('./result', 'w') as resfile:
             with open('../gid_order') as ordfile:
-                for gid, res in zip(It, list(ordfile.readlines())):
-                    resfile.write(gid+','+res+'\n')
+                for res, gid in zip(It, list(ordfile.readlines())):
+                    resfile.write(gid+','+str(res)+'\n')
     prid = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy())
     print(prid)
     # to_csv(prid, './prid.csv')
