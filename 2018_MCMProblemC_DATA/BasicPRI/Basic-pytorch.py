@@ -60,7 +60,7 @@ class BasicModule(torch.nn.Module):
         self.weight = torch.nn.init.normal_(weight, mean=0.0) 
         
     def forward(self,x):
-        out = torch.mm(self.weight, x) + bias
+        out = torch.nn.ReLU(torch.mm(self.weight, x) + bias)
         return out
 
 class loss(torch.nn.Module):
@@ -70,7 +70,7 @@ class loss(torch.nn.Module):
     def forward(self,out, U, V):
         loss = 0
         for i in range(num_years-1):
-            loss += torch.norm((U[:, i]-torch.mv(net.weight, V[:, i])),p=2)**2
+            loss += torch.norm((U[:, i]-out),p=2)**2
         loss = loss/(stddev**2)
         print(loss)
         self.loss = loss
@@ -168,7 +168,7 @@ def train():
     I = []
     net.train()
     overiter = 0
-    for i in range(3000):
+    for i in range(3):
         U_raw, V_raw = read_data()
         V = torch.autograd.Variable(torch.transpose(torch.Tensor(V_raw),0,1).cuda())
         U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1).cuda())
