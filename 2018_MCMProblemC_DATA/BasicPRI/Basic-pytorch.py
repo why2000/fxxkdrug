@@ -15,7 +15,7 @@ bias = []
 for i in range(num_years):
     b = torch.randn(num_cities)
     bias.append(list(torch.nn.init.normal_(b, mean=0.0, std=stddev)))
-bias = torch.transpose(torch.Tensor(bias),0,1)
+bias = torch.transpose(torch.Tensor(bias),0,1).cuda()
 
 def loadpol(filename, namedict):
     fileinfo = {}
@@ -56,7 +56,6 @@ def to_csv(input_list, filepath):
 class BasicModule(torch.nn.Module):
     def __init__(self):
         super(BasicModule, self).__init__()
-        bias = []
         weight = torch.nn.Parameter(torch.randn(num_cities, num_cities))
         self.weight = torch.nn.init.normal_(weight, mean=0.0) 
         
@@ -165,7 +164,7 @@ def train():
         U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1).cuda())
         optimizer.zero_grad()
         out = net.forward(V)
-        net2 = loss()
+        net2 = loss().cuda()
         l = net2(out, U, V)
         l.backward()
         optimizer.step()
