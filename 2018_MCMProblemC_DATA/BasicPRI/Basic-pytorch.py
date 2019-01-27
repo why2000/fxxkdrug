@@ -158,7 +158,7 @@ def read_data():
 
 def train():
     net.train()
-    for i in range(2):
+    for i in range(100):
         U_raw, V_raw = read_data()
         V = torch.autograd.Variable(torch.transpose(torch.Tensor(V_raw),0,1).cuda())
         U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1).cuda())
