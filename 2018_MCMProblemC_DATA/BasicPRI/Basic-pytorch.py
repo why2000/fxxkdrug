@@ -183,7 +183,7 @@ def train():
         print('loss2:')
         bufff = 0
         for i in range(num_years-1):
-            buffff = torch.norm((U[:, i]-torch.mv(net.weight, V[:, i])),p=2)**2, end=','
+            buffff = torch.norm((U[:, i]-torch.mv(net.weight, V[:, i])),p=2)**2
             buff += buffff
             print(buffff)
         print(buff)
