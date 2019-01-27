@@ -81,7 +81,7 @@ net = BasicModule()
 net = net.cuda()
 cudnn.benchmark = True
 
-optimizer = torch.optim.Adam(net.parameters(),lr=0.1)
+optimizer = torch.optim.Adam(net.parameters(),lr=0.25)
 
 def read_data():
     fileloaded = xlrd.open_workbook('../MCM_NFLIS_Data.xlsx')
@@ -142,7 +142,10 @@ def read_data():
         if onefile.startswith('.'):
             continue
         poldict = dict(poldict, **loadpol(onefile, namedict))
+    gids = []
     gids = list(namedict['OH'].values())
+    #for key in namedict.keys():
+    #    gids.extend(list(namedict[key].values()))
     infected = []
     inf_rate = []
     with open('../gid_order', 'w') as order_table:
@@ -164,7 +167,8 @@ def read_data():
 def train():
     I = []
     net.train()
-    for i in range(2):
+    overiter = 0
+    for i in range(2000):
         U_raw, V_raw = read_data()
         V = torch.autograd.Variable(torch.transpose(torch.Tensor(V_raw),0,1).cuda())
         U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1).cuda())
@@ -175,13 +179,16 @@ def train():
         l = net2(out, U, V)
         l.backward()
         optimizer.step()
-        if l.loss < 3:
+        if net2.loss < 0.5:
+            overiter += 1
+            print('U:')
+        if overiter > 6:
             break
     for i in range(2011, 2016):
         It = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, i-2011]) + V[:, i-2011]).detach().numpy())
         I.append(It)
-        with open('./result', 'w') as resfile:
-            with open('../gid_order') as ordfile:
+        with open('./result'+str(i+1), 'w') as resfile:
+            with open('../gid_order', 'r') as ordfile:
                 for res, gid in zip(It, list(ordfile.readlines())):
                     resfile.write(gid.strip('\n')+','+str(res)+'\n')
     prid = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy())
