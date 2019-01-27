@@ -181,7 +181,7 @@ def train():
         print(list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy()))
         print(list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -4])).detach().numpy()))
         print('loss2:')
-        bufff = 0
+        buff = 0
         for i in range(num_years-1):
             buffff = torch.norm((U[:, i]-torch.mv(net.weight, V[:, i])),p=2)**2
             buff += buffff
