@@ -19,7 +19,7 @@ bias = torch.transpose(torch.Tensor(bias),0,1)
 
 def loadpol(filename, namedict):
     fileinfo = {}
-    path = os.path.join('./2018_MCMProblemC_DATA/人口/',filename)
+    path = os.path.join('./人口/',filename)
     with open(path, 'r', encoding='utf-8') as onefile:
         for i, row in enumerate(onefile.readlines()):
             rowsplit = row.split(',')
