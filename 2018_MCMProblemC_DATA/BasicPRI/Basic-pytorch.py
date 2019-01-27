@@ -3,6 +3,7 @@ import torchvision
 from math import *
 import xlrd
 import os
+import torch.backends.cudnn as cudnn
 
 stddev = 1.0
 num_years = 5
@@ -10,6 +11,7 @@ num_cities = 88
 learning_rate = 1e-3
 num_step = 3
 bias = []
+
 for i in range(num_years):
     b = torch.randn(num_cities)
     bias.append(list(torch.nn.init.normal_(b, mean=0.0, std=stddev)))
@@ -73,6 +75,10 @@ class loss(torch.nn.Module):
         return loss
 
 net = BasicModule()
+
+net = net.cuda()
+cudnn.benchmark = True
+
 optimizer = torch.optim.SGD(net.parameters(),lr=0.001)
 
 def read_data():
@@ -155,8 +161,8 @@ def train():
     net.train()
     for i in range(2):
         U_raw, V_raw = read_data()
-        V = torch.autograd.Variable(torch.transpose(torch.Tensor(V_raw),0,1))
-        U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1))
+        V = torch.autograd.Variable(torch.transpose(torch.Tensor(V_raw),0,1).cuda())
+        U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1).cuda())
         optimizer.zero_grad()
         out = net.forward(V)
         net2 = loss()
