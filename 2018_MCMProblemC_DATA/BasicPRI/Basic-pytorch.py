@@ -275,7 +275,7 @@ def train():
             
         if overiter > 6:
             break
-        if i % 1000 == 0:
+        if i % 1000 == 0 and i != 0:
             for j in range(2011, 2016):
                 It = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, j-2011]) + V[:, j-2011]).detach().numpy())
                 I.append(It)
@@ -287,7 +287,7 @@ def train():
                     Wsave = torch.Tensor.cpu(net.weight).detach().numpy()
                     for line in Wsave:
                         modulefile.write(','.join(map(str,list(line)))+'\n')
-
+    print("Finished!")
     # to_csv(prid, './prid.csv')
 
 
