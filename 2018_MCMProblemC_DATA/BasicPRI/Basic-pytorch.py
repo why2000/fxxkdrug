@@ -208,7 +208,7 @@ def read_data():
 
     infoall = {}
     for key in infolist.keys():
-        infoall = dict(infoall, infolist[key])
+        infoall = dict(infoall, **infolist[key])
     for gid in gids:
         county = infoall[gid]
         xs.append(county[0])
