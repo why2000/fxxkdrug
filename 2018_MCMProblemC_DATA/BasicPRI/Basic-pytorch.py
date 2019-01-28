@@ -5,7 +5,7 @@ import xlrd
 import os
 import torch.backends.cudnn as cudnn
 import torch.nn.functional as Tfun
-
+statename = 'OH'
 stddeve = 0.01
 stddevg = 0.1
 stddevw = 0.1
@@ -176,7 +176,7 @@ def read_data():
             continue
         poldict = dict(poldict, **loadpol(onefile, namedict))
     gids = []
-    gids = list(namedict['OH'].values())
+    gids = list(namedict[statename].values())
     #for key in namedict.keys():
     #    gids.extend(list(namedict[key].values()))
     infected = []
@@ -273,7 +273,7 @@ def train():
     for i in range(2011, 2016):
         It = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, i-2011]) + V[:, i-2011]).detach().numpy())
         I.append(It)
-        with open('./result'+str(i+1), 'w') as resfile:
+        with open('./result'+statename+str(i+1), 'w') as resfile:
             with open('../gid_order', 'r') as ordfile:
                 for res, gid in zip(It, list(ordfile.readlines())):
                     resfile.write(gid.strip('\n')+','+str(res)+'\n')
