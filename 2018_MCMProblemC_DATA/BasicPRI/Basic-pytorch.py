@@ -177,6 +177,7 @@ def read_data():
         poldict = dict(poldict, **loadpol(onefile, namedict))
     gids = []
     gids = list(namedict[statename].values())
+    print(len(gids))
     #for key in namedict.keys():
     #    gids.extend(list(namedict[key].values()))
     infected = []
