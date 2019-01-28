@@ -112,10 +112,6 @@ class loss(torch.nn.Module):
 net = BasicModule()
 
 net = net.cuda()
-
-soft_constraint = NonNeg(lagrangian=True, scale=1e-7, module_filter='*fc*')
-constraints = [soft_constraint]
-net.set_constraints(constraints)
 cudnn.benchmark = True
 
 optimizer = torch.optim.Adam(net.parameters(),lr=0.5)
