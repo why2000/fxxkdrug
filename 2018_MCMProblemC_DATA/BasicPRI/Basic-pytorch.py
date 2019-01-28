@@ -253,6 +253,8 @@ def train():
         print(list(torch.Tensor.cpu(U[:,-1]).detach().numpy()))
         print(list(torch.Tensor.cpu(U[:,-4]).detach().numpy()))
         print('V:')
+        print(net.weight.shape)
+        print(V[:,-1].shape)
         print(list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy()))
         print(list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -4])).detach().numpy()))
         optimizer.zero_grad()
