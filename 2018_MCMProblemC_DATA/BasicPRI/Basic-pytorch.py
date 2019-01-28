@@ -225,7 +225,10 @@ def read_data():
     for gid1 in gids:
         bufdis = []
         for gid2 in gids:
-            bufdis.append(poldict[gid1]*poldict[gid2]/rtable[gid1][gid2]**2)
+            if gid2 == gid1:
+                bufdis.append(0)
+            else:
+                bufdis.append(poldict[gid1]*poldict[gid2]/rtable[gid1][gid2]**2)
         pollist.append(bufpol)
     
     return inf_rate, infected, dislist
