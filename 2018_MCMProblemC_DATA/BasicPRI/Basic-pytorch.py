@@ -82,6 +82,7 @@ class BasicModule(torch.nn.Module):
         super(BasicModule, self).__init__()
         weight = torch.ones(num_cities, num_cities)
         self.weight = torch.nn.Parameter(torch.nn.init.normal_(weight, mean=4*stddevg, std=stddevg))
+        print(weight)
         weight2 = torch.randn((1))
         self.weight2 = torch.nn.Parameter(torch.nn.init.normal_(weight2, mean=4*stddevw, std=stddevw))
         
