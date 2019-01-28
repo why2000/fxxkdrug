@@ -103,7 +103,7 @@ class loss(torch.nn.Module):
         loss += stddeve**2 * lgg
         loss += torch.norm(G-w*D, p=2)**2*stddevg**2/stddeve**2
         loss += torch.norm(w**2,p=1)*(stddeve**2/stddevw**2)
-        loss += torch.sum(G.lt(0)*G*10)
+        loss += torch.sum(G.lt(0).float()*G*10)
         print(loss)
         self.loss = loss
         return loss
