@@ -275,7 +275,7 @@ def train():
             
         if overiter > 6:
             break
-        if i % 1000 == 0 and i != 0:
+        if i % 1000 == 0:
             for j in range(2011, 2016):
                 It = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, j-2011]) + V[:, j-2011]).detach().numpy())
                 I.append(It)
@@ -283,8 +283,11 @@ def train():
                     with open('../gid_order', 'r') as ordfile:
                         for res, gid in zip(It, list(ordfile.readlines())):
                             resfile.write(gid.strip('\n')+','+str(res)+'\n')
-    prid = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy())
-    print(prid)
+                with open('./weight'+statechose+'_'+str(i)+'.csv', 'w') as modulefile:
+                    Wsave = torch.Tensor.cpu(net.weight).detach.numpy()
+                    for line in Wsave:
+                        modulefile.write(','.join(list(line.numpy()))+'\n')
+
     # to_csv(prid, './prid.csv')
 
 
