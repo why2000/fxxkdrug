@@ -5,7 +5,9 @@ import xlrd
 import os
 import torch.backends.cudnn as cudnn
 
-stddev = 1.0
+stddeve = 1.0
+stddevg = 1.0
+stddevw = 1.0
 num_years = 6
 num_cities = 88
 learning_rate = 1e-3
@@ -14,7 +16,7 @@ bias = []
 
 for i in range(num_years):
     b = torch.randn(num_cities)
-    bias.append(list(torch.nn.init.normal_(b, mean=0.0, std=stddev)))
+    bias.append(list(torch.nn.init.normal_(b, mean=0.0, std=stddeve)))
 bias = torch.transpose(torch.Tensor(bias),0,1).cuda()
 
 def loadpol(filename, namedict):
@@ -57,7 +59,8 @@ class BasicModule(torch.nn.Module):
     def __init__(self):
         super(BasicModule, self).__init__()
         weight = torch.nn.Parameter(torch.randn(num_cities, num_cities))
-        self.weight = torch.nn.init.normal_(weight, mean=0.0) 
+        self.weight = torch.nn.init.normal_(weight, mean=0.0, std=stddevg) 
+        weight2 = torch.nn.Parameter(torch.randn(1, mean=0.0, std=stddevw))
         
     def forward(self,x):
         out = torch.mm(self.weight, x) + bias
@@ -67,12 +70,16 @@ class loss(torch.nn.Module):
     def __init__(self):
         self.loss = 0
         super(loss, self).__init__()
-    def forward(self,out, U, V):
+    def forward(self,G,out,U,V,D,w):
         loss = 0
+        lgg = 0
         for i in range(num_years-1):
-    
             loss += torch.norm((U[:, i]-out[:,i]),p=2)**2
-        loss = loss/(stddev**2)
+        for i in range(num_cities):
+            lgg += log(torch.norm(G[:,i], p=1))
+        loss += stddeve**2 * lgg
+        loss += torch.norm(G-w*D, p=2)**2*stddevg**2/stddeve**2
+        loss += w**2*stddeve**2/stddevw**2
         print(loss)
         self.loss = loss
         return loss
@@ -163,16 +170,27 @@ def read_data():
             buf_inf_rate.append((yeardict[year][gid]-yeardict[year-1][gid])/(poldict[gid]-yeardict[year-1][gid]))
         inf_rate.append(buf_inf_rate)
         infected.append(buf_infected)
-    return inf_rate, infected
+    
+    pollist = []
+    for gid1 in gids:
+        bufpol = []
+        for gid2 in gids:
+            bufpol.append(poldict[gid1][gid2])
+        pollist.append(bufpol)
+    
+    return inf_rate, infected, pollist
+
+
 
 def train():
     I = []
     net.train()
     overiter = 0
-    for i in range(3000):
-        U_raw, V_raw = read_data()
+    for i in range(3):
+        U_raw, V_raw, D_raw = read_data()
         V = torch.autograd.Variable(torch.transpose(torch.Tensor(V_raw),0,1).cuda())
         U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1).cuda())
+        D = torch.autograd.Variable(torch.Tensor(D_raw).cuda())
         print("G:")
         print(net.weight)
         print('U:')
@@ -181,26 +199,19 @@ def train():
         print('V:')
         print(list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy()))
         print(list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -4])).detach().numpy()))
-        print('loss2:')
-        buff = 0
-        for i in range(num_years-1):
-            buffff = torch.norm((U[:, i]-torch.mv(net.weight, V[:, i])),p=2)**2
-            buff += buffff
-            print(buffff)
-        print(buff)
         optimizer.zero_grad()
         out = net.forward(V)
         print('out:')
         print(out.shape)
         net2 = loss().cuda()
-        l = net2(out, U, V)
+        l = net2(net.weight, out, U, V, D, net.weight2)
         l.backward()
         optimizer.step()
-        if net2.loss < 0.000001:
-            overiter += 1
+        # if net2.loss < 0.000001:
+        #     overiter += 1
             
-        if overiter > 6:
-            break
+        # if overiter > 6:
+        #     break
     for i in range(2011, 2016):
         It = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, i-2011]) + V[:, i-2011]).detach().numpy())
         I.append(It)
