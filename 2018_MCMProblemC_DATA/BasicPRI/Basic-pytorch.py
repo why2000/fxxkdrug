@@ -80,10 +80,10 @@ def to_csv(input_list, filepath):
 class BasicModule(torch.nn.Module):
     def __init__(self):
         super(BasicModule, self).__init__()
-        weight = torch.nn.Parameter(torch.randn(num_cities, num_cities))
-        self.weight = torch.nn.init.normal_(weight, mean=3*stddevg, std=stddevg) 
-        weight2 = torch.nn.Parameter(torch.randn((1)))
-        self.weight2 = torch.nn.init.normal_(weight2, mean=3*stddevw, std=stddevw) 
+        weight = torch.ones(num_cities, num_cities)
+        self.weight = torch.nn.Parameter(torch.nn.init.normal_(weight, mean=4*stddevg, std=stddevg))
+        weight2 = torch.randn((1))
+        self.weight2 = torch.nn.Parameter(torch.nn.init.normal_(weight2, mean=4*stddevw, std=stddevw))
         
     def forward(self,x):
         out = torch.mm(self.weight, x) + bias
