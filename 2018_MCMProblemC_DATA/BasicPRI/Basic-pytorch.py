@@ -286,7 +286,7 @@ def train():
                 with open('./weight'+statechose+'_'+str(i)+'.csv', 'w') as modulefile:
                     Wsave = torch.Tensor.cpu(net.weight).detach().numpy()
                     for line in Wsave:
-                        modulefile.write(','.join(list(line.numpy()))+'\n')
+                        modulefile.write(','.join(list(line))+'\n')
 
     # to_csv(prid, './prid.csv')
 
