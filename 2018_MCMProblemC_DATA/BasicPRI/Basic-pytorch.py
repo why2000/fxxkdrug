@@ -86,8 +86,8 @@ class BasicModule(torch.nn.Module):
         self.weight2 = torch.nn.init.normal_(weight2, mean=0.0, std=stddevw) 
         
     def forward(self,x):
-        self.weight = F.relu(self.weight)
-        self.weight2 = F.relu(self.weight2)
+        self.weight = Tfun.relu(self.weight)
+        self.weight2 = Tfun.relu(self.weight2)
         out = torch.mm(self.weight, x) + bias
         return out
 
