@@ -4,6 +4,7 @@ from math import *
 import xlrd
 import os
 import torch.backends.cudnn as cudnn
+import torch.nn.functional as Tfun
 
 stddeve = 1.0
 stddevg = 1.0
@@ -85,6 +86,8 @@ class BasicModule(torch.nn.Module):
         self.weight2 = torch.nn.init.normal_(weight2, mean=0.0, std=stddevw) 
         
     def forward(self,x):
+        self.weight = F.relu(self.weight)
+        self.weight2 = F.relu(self.weight2)
         out = torch.mm(self.weight, x) + bias
         return out
 
@@ -109,6 +112,10 @@ class loss(torch.nn.Module):
 net = BasicModule()
 
 net = net.cuda()
+
+soft_constraint = NonNeg(lagrangian=True, scale=1e-7, module_filter='*fc*')
+constraints = [soft_constraint]
+net.set_constraints(constraints)
 cudnn.benchmark = True
 
 optimizer = torch.optim.Adam(net.parameters(),lr=0.5)
