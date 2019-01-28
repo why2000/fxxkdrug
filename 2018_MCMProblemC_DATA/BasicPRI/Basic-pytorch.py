@@ -60,7 +60,8 @@ class BasicModule(torch.nn.Module):
         super(BasicModule, self).__init__()
         weight = torch.nn.Parameter(torch.randn(num_cities, num_cities))
         self.weight = torch.nn.init.normal_(weight, mean=0.0, std=stddevg) 
-        weight2 = torch.nn.Parameter(torch.randn(1, mean=0.0, std=stddevw))
+        weight2 = torch.nn.Parameter(torch.randn((1)))
+        self.weight2 = torch.nn.init.normal_(weight2, mean=0.0, std=stddevw) 
         
     def forward(self,x):
         out = torch.mm(self.weight, x) + bias
