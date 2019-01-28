@@ -176,7 +176,7 @@ def read_data():
     for gid1 in gids:
         bufpol = []
         for gid2 in gids:
-            bufpol.append(poldict[gid1][gid2])
+            bufpol.append(poldict[str(gid1)][str(gid2)])
         pollist.append(bufpol)
     
     return inf_rate, infected, pollist
