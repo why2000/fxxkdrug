@@ -6,9 +6,9 @@ import os
 import torch.backends.cudnn as cudnn
 import torch.nn.functional as Tfun
 
-stddeve = 0.2
-stddevg = 1.0
-stddevw = 1.0
+stddeve = 0.01
+stddevg = 0.1
+stddevw = 0.1
 num_years = 6
 num_cities = 88
 learning_rate = 1e-3
@@ -81,10 +81,10 @@ class BasicModule(torch.nn.Module):
     def __init__(self):
         super(BasicModule, self).__init__()
         weight = torch.ones(num_cities, num_cities)
-        self.weight = torch.nn.Parameter(torch.nn.init.normal_(weight, mean=4*stddevg, std=stddevg))
+        self.weight = torch.nn.Parameter(torch.nn.init.normal_(weight, mean=2*stddevg, std=stddevg))
         print(weight)
         weight2 = torch.randn((1))
-        self.weight2 = torch.nn.Parameter(torch.nn.init.normal_(weight2, mean=4*stddevw, std=stddevw))
+        self.weight2 = torch.nn.Parameter(torch.nn.init.normal_(weight2, mean=2*stddevw, std=stddevw))
         
     def forward(self,x):
         out = torch.mm(self.weight, x) + bias
