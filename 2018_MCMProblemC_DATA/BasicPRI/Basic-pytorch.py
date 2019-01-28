@@ -7,7 +7,7 @@ import torch.backends.cudnn as cudnn
 import torch.nn.functional as Tfun
 statename = 'OH'
 stddeve = 0.01
-stddevg = 0.1
+stddevg = 0.05
 stddevw = 0.1
 num_years = 6
 num_cities = 88
@@ -104,7 +104,7 @@ class loss(torch.nn.Module):
         loss += stddeve**2 * lgg
         loss += torch.norm(G-w*D, p=2)**2*stddevg**2/stddeve**2
         loss += torch.norm(w**2,p=1)*(stddeve**2/stddevw**2)
-        loss -= torch.sum(G.lt(0).float()*G*100)
+        loss -= torch.sum(G.lt(0).float()*G*1000)
         print(loss)
         self.loss = loss
         return loss
