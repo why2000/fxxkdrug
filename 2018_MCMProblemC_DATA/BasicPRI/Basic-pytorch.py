@@ -263,6 +263,8 @@ def train():
         out = net.forward(V)
         print('out:')
         print(out.shape)
+        print('w:')
+        print(net.weight2)
         net2 = loss().cuda()
         l = net2(net.weight, out, U, V, D, net.weight2)
         l.backward()
