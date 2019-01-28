@@ -202,11 +202,22 @@ def read_data():
         if onefile.startswith('.'):
             continue
         infolist[onefile] = loadcoor(onefile)
-    
+        
+    xs = []
+    ys = []
+
+    infoall = {}
+    for key in infolist.keys():
+        infoall = dict(infoall, infolist[key])
+    for gid in gids:
+        county = infoall[gid]
+        xs.append(county[0])
+        ys.append(county[1])
+
     rtable = {}
-    for x1, y1, gid1 in zip(x,y,gids_raw):
+    for x1, y1, gid1 in zip(xs,ys,gids):
         rtable[gid1] = {}
-        for x2, y2, gid2 in zip(x,y,gids_raw):
+        for x2, y2, gid2 in zip(xs,ys,gids):
             radius = caculatela(x1, y1, x2, y2)
             rtable[gid1][gid2] = radius
     
