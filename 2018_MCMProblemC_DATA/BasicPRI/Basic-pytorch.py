@@ -81,13 +81,11 @@ class BasicModule(torch.nn.Module):
     def __init__(self):
         super(BasicModule, self).__init__()
         weight = torch.nn.Parameter(torch.randn(num_cities, num_cities))
-        self.weight = torch.nn.init.normal_(weight, mean=0.0, std=stddevg) 
+        self.weight = torch.nn.init.normal_(weight, mean=stddevg, std=stddevg) 
         weight2 = torch.nn.Parameter(torch.randn((1)))
-        self.weight2 = torch.nn.init.normal_(weight2, mean=0.0, std=stddevw) 
+        self.weight2 = torch.nn.init.normal_(weight2, mean=stddevw, std=stddevw) 
         
     def forward(self,x):
-        self.weight = Tfun.relu(self.weight)
-        self.weight2 = Tfun.relu(self.weight2)
         out = torch.mm(self.weight, x) + bias
         return out
 
@@ -105,6 +103,7 @@ class loss(torch.nn.Module):
         loss += stddeve**2 * lgg
         loss += torch.norm(G-w*D, p=2)**2*stddevg**2/stddeve**2
         loss += torch.norm(w**2,p=1)*(stddeve**2/stddevw**2)
+        loss += torch.sum(G.lt(0).dot(G)*10)
         print(loss)
         self.loss = loss
         return loss
