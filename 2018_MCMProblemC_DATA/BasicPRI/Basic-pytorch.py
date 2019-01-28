@@ -19,6 +19,27 @@ for i in range(num_years):
     bias.append(list(torch.nn.init.normal_(b, mean=0.0, std=stddeve)))
 bias = torch.transpose(torch.Tensor(bias),0,1).cuda()
 
+def loadcoor(filename):
+    fileinfo = {}
+    path = os.path.join('../坐标/',filename)
+    with open(path, 'r', encoding='utf-8') as onefile:
+        for i, row in enumerate(onefile.readlines()):
+            if i == 0:
+                continue
+            rowsplit = row.split('\t')
+            infoneeded = [float(rowsplit[-1].strip('\n').strip('\t').strip(' ')), float(rowsplit[-2].strip('\t').strip(' '))]
+            fileinfo[rowsplit[1]] = infoneeded
+    return fileinfo
+
+def caculatela(lon1, lat1, lon2, lat2):
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+    dlon = lon2 - lon1 
+    dlat = lat2 - lat1 
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a)) 
+    r = 6371
+    return c * r * 1000
+
 def loadpol(filename, namedict):
     fileinfo = {}
     path = os.path.join('../人口/',filename)
@@ -171,15 +192,32 @@ def read_data():
             buf_inf_rate.append((yeardict[year][gid]-yeardict[year-1][gid])/(poldict[gid]-yeardict[year-1][gid]))
         inf_rate.append(buf_inf_rate)
         infected.append(buf_infected)
-    
     pollist = []
+    for gid in gids:
+        pollist.append(poldict[gid])
+
+    allfile = os.listdir('../坐标/')
+    infolist = {}
+    for onefile in allfile:
+        if onefile.startswith('.'):
+            continue
+        infolist[onefile] = loadcoor(onefile)
+    
+    rtable = {}
+    for x1, y1, gid1 in zip(x,y,gids_raw):
+        rtable[gid1] = {}
+        for x2, y2, gid2 in zip(x,y,gids_raw):
+            radius = caculatela(x1, y1, x2, y2)
+            rtable[gid1][gid2] = radius
+    
+    dislist = []
     for gid1 in gids:
-        bufpol = []
+        bufdis = []
         for gid2 in gids:
-            bufpol.append(poldict[str(gid1)][str(gid2)])
+            bufdis.append(poldict[gid1]*poldict[gid2]/rtable[gid1][gid2]**2)
         pollist.append(bufpol)
     
-    return inf_rate, infected, pollist
+    return inf_rate, infected, dislist
 
 
 
