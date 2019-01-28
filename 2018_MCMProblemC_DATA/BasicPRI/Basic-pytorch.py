@@ -6,8 +6,8 @@ import os
 import torch.backends.cudnn as cudnn
 import torch.nn.functional as Tfun
 statechose = 'OH'
-stddeve = 0.01
-stddevg = 0.05
+stddeve = 0.002
+stddevg = 0.01
 stddevw = 0.1
 num_years = 6
 num_cities = 88
@@ -116,6 +116,8 @@ cudnn.benchmark = True
 
 optimizer = torch.optim.Adam(net.parameters(),lr=0.5)
 
+
+# Anyone reading this module can just skip this data loading part, it's a copy of my "intricate" code in jupyter notebook, really hard to understand :p
 def read_data():
     fileloaded = xlrd.open_workbook('../MCM_NFLIS_Data.xlsx')
     table = fileloaded.sheets()[1]
@@ -243,7 +245,7 @@ def train():
     I = []
     net.train()
     overiter = 0
-    for i in range(1000):
+    for i in range(10000):
         U_raw, V_raw, D_raw = read_data()
         V = torch.autograd.Variable(torch.transpose(torch.Tensor(V_raw),0,1).cuda())
         U = torch.autograd.Variable(torch.transpose(torch.Tensor(U_raw),0,1).cuda())
@@ -268,18 +270,19 @@ def train():
         l = net2(net.weight, out, U, V, D, net.weight2)
         l.backward()
         optimizer.step()
-        # if net2.loss < 0.000001:
-        #     overiter += 1
+        if net2.loss < 0.1:
+            overiter += 1
             
-        # if overiter > 6:
-        #     break
-    for i in range(2011, 2016):
-        It = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, i-2011]) + V[:, i-2011]).detach().numpy())
-        I.append(It)
-        with open('./result'+statechose+str(i+1), 'w') as resfile:
-            with open('../gid_order', 'r') as ordfile:
-                for res, gid in zip(It, list(ordfile.readlines())):
-                    resfile.write(gid.strip('\n')+','+str(res)+'\n')
+        if overiter > 6:
+            break
+        if i % 1000 == 0 and i != 0:
+            for j in range(2011, 2016):
+                It = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, j-2011]) + V[:, j-2011]).detach().numpy())
+                I.append(It)
+                with open('./result'+statechose+str(j+1)+'_'+str(i), 'w') as resfile:
+                    with open('../gid_order', 'r') as ordfile:
+                        for res, gid in zip(It, list(ordfile.readlines())):
+                            resfile.write(gid.strip('\n')+','+str(res)+'\n')
     prid = list(torch.Tensor.cpu(torch.mv(net.weight, V[:, -1])).detach().numpy())
     print(prid)
     # to_csv(prid, './prid.csv')
